@@ -24,3 +24,8 @@ def mvnCMD = "${M2_HOME}"
 
 
 }
+node{
+    stage("test"){
+        sh "ipconfig"
+    }
+}

@@ -1,29 +1,22 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
-        }
+    agent any
+    tools {
+        maven "Maven3"
     }
     stages {
         stage('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
+
+                script {
+                    def os = System.properties['os.name'].toLowerCase()
+                    echo "OS: ${os}"                
+                    if (os.contains("linux")) {
+                      sh "mvn clean install -DskipTests" 
+                    } else {
+                      bat "mvn clean install -DskipTests"
+                    }
                 }
-            }
-        }
-        stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
+
             }
         }
     }

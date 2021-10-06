@@ -1,23 +1,26 @@
-pipeline {
-    agent any
-    tools {
-        maven "Maven3"
-    }
-    stages {
-        stage('Build') {
-            steps {
+node{
+    stage('Scm Checkout'){
+    git credentialsId: 'git', url: 'https://github.com/kishanpeddaboina/kishan'
+}
+    stage('Mvn Package'){
+    def M2_HOME = tool name: 'Maven', type: 'maven'
+def mvnCMD = "${M2_HOME}"
+    sh "${mvnCMD} clean package"
+}
+     stage('Build Docker'){
+     sh 'docker build -t kishanpeddaboina/my-app:${BUILD_NUMBER} .'
+}
+    stage('Push Docker Image'){
+        
+    withCredentials([string(credentialsId: 'docker', variable: 'docker')]) {
+     sh "docker login -u kishanpeddaboina --password-stdin ${docker}"
+}
+     sh 'docker push kishanpeddaboina/my-app:${BUILD_NUMBER}'
+  
 
-                script {
-                    def os = System.properties['os.name'].toLowerCase()
-                    echo "OS: ${os}"                
-                    if (os.contains("linux")) {
-                      sh "mvn clean install -DskipTests" 
-                    } else {
-                      bat "mvn clean install -DskipTests"
-                    }
-                }
+}
 
-            }
-        }
-    }
+
+
+
 }

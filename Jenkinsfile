@@ -5,7 +5,7 @@ node{
     stage('Mvn Package'){
     def M2_HOME = tool name: 'maven-3', type: 'maven'
     def mvnCMD = "${M2_HOME}"
-    sh 'mvn clean package'
+    bat 'mvn clean package'
 }
      stage('Build Docker'){
      sh 'docker build -t bojja/my-app:${BUILD_NUMBER} .'
